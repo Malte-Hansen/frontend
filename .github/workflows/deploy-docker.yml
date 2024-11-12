@@ -95,7 +95,7 @@ jobs:
           export PLATFORM=$(echo ${{ matrix.platform }} | cut -d'/' -f2)
           docker buildx build \
             --platform ${{ matrix.platform }} \
-            --tag ${{ vars.DOCKER_IMAGE_NAME }}:$PLATFORM-auth0-${{ auth0_enabled }} . \
+            --tag ${{ vars.DOCKER_IMAGE_NAME }}:$PLATFORM . \
             --push
 
   publish-multi-arch-prod:
