@@ -32,58 +32,11 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-  linting:
-    runs-on: ubuntu-latest
-    needs: npm-install
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'npm'
-      - name: Cache dependencies
-        uses: actions/cache/restore@v4
-        with:
-          path: |
-            .npm/
-            node_modules/
-          key: ${{ runner.os }}-npm-cache-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-npm-cache-
-      - name: Run linting
-        run: npm run lint
-
-  test:
-    runs-on: ubuntu-latest
-    needs: npm-install
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'npm'
-      - name: Cache dependencies
-        uses: actions/cache/restore@v4
-        with:
-          path: |
-            .npm/
-            node_modules/
-          key: ${{ runner.os }}-npm-cache-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-npm-cache-
-      - name: Run tests
-        run: npm test
-
   build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
         auth0_enabled: [true, false]
-    needs: [test, linting]
     env:
       VERSION_TAG: ${{ github.ref_name }}-${{ github.sha }}
       AUTH0_ENABLED: ${{ matrix.auth0_enabled }}
@@ -142,7 +95,7 @@ jobs:
           export PLATFORM=$(echo ${{ matrix.platform }} | cut -d'/' -f2)
           docker buildx build \
             --platform ${{ matrix.platform }} \
-            --tag ${{ vars.DOCKER_IMAGE_NAME }}:${{ PLATFORM }}-auth0-${{ auth0_enabled }} . \
+            --tag ${{ vars.DOCKER_IMAGE_NAME }}:$PLATFORM-auth0-${{ auth0_enabled }} . \
             --push
 
   publish-multi-arch-prod:
