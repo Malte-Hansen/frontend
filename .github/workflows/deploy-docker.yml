@@ -80,9 +80,13 @@ jobs:
 
   build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        auth0_enabled: [true, false]
     needs: [test, linting]
     env:
       VERSION_TAG: ${{ github.ref_name }}-${{ github.sha }}
+      AUTH0_ENABLED: ${{ matrix.auth0_enabled }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
